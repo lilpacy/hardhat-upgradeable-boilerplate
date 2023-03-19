@@ -20,5 +20,8 @@ module.exports = {
       "error",
       { ignores: ["modules"] },
     ],
+    camelcase: "off",
+    "node/no-extraneous-import": "off",
+    "no-unused-vars": "off",
   },
 };
