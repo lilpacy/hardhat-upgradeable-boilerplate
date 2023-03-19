@@ -8,6 +8,7 @@ import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "hardhat-prettier";
 import "@nomiclabs/hardhat-ethers";
+import "@openzeppelin/hardhat-upgrades";
 
 dotenv.config();
 

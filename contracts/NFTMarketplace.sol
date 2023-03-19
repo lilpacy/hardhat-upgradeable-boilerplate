@@ -4,10 +4,11 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
+import "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "hardhat/console.sol";
 
-contract NFTMarketplace is EIP712 {
+contract NFTMarketplace is Initializable, EIP712Upgradeable {
     using SafeERC20 for IERC20;
     using ECDSA for bytes32;
 
@@ -18,8 +19,7 @@ contract NFTMarketplace is EIP712 {
         bool isSold;
     }
 
-    bytes32 private constant _LISTING_TYPEHASH =
-        keccak256("Buy(uint256 tokenId,uint256 price,address seller)");
+    bytes32 private _LISTING_TYPEHASH;
 
     IERC721 public nft;
     IERC20 public erc20;
@@ -39,9 +39,17 @@ contract NFTMarketplace is EIP712 {
         address indexed buyer
     );
 
-    constructor(IERC721 _nft, IERC20 _erc20) EIP712("NFTMarketplace", "1") {
+    function initialize(IERC721 _nft, IERC20 _erc20)
+        public
+        virtual
+        initializer
+    {
+        __EIP712_init("NFTMarketplace", "1");
         nft = _nft;
         erc20 = _erc20;
+        _LISTING_TYPEHASH = keccak256(
+            "Buy(uint256 tokenId,uint256 price,address seller)"
+        );
     }
 
     function list(uint256 _tokenId, uint256 _price) external {

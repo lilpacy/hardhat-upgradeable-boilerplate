@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 import { BigNumber } from "@ethersproject/bignumber";
 import { Wallet } from "ethers";
 import {
@@ -33,10 +33,12 @@ describe("NFTMarketplace", () => {
     ]);
     nft = await new MyERC721__factory(owner).deploy(sellerAddress);
     erc20 = await new MyERC20__factory(owner).deploy("1000", buyerAddress);
-    marketplace = await new NFTMarketplace__factory(owner).deploy(
-      nft.address,
-      erc20.address
-    );
+    marketplace = (await upgrades.deployProxy(
+      new NFTMarketplace__factory(owner),
+      [nft.address, erc20.address],
+      { initializer: "initialize" }
+    )) as NFTMarketplace;
+    await marketplace.deployed();
   });
 
   it("success; should allow seller to list an NFT for sale", async () => {
